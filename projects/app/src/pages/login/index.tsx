@@ -124,7 +124,7 @@ const Login = () => {
               textAlign={'center'}
               // onClick={onOpen}
             >
-              Powered by alibam
+              Powered by Alibam
             </Box>
           )}
         </Flex>
