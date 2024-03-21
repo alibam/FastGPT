@@ -300,32 +300,32 @@ const UserInfo = () => {
           </>
         )}
 
-        {feConfigs?.docUrl && (
-          <Link
-            href={getDocPath('/docs/intro')}
-            target="_blank"
-            display={'flex'}
-            mt={4}
-            w={['85%', '300px']}
-            py={3}
-            px={6}
-            border={theme.borders.sm}
-            borderWidth={'1.5px'}
-            borderRadius={'md'}
-            alignItems={'center'}
-            userSelect={'none'}
-            textDecoration={'none !important'}
-          >
-            <MyIcon name={'common/courseLight'} w={'18px'} color={'myGray.600'} />
-            <Box ml={2} flex={1}>
-              {t('system.Help Document')}
-            </Box>
-            <Box w={'8px'} h={'8px'} borderRadius={'50%'} bg={'#67c13b'} />
-            <Box fontSize={'md'} ml={2}>
-              V{systemVersion}
-            </Box>
-          </Link>
-        )}
+        {/*{feConfigs?.docUrl && (*/}
+        {/*  <Link*/}
+        {/*    href={getDocPath('/docs/intro')}*/}
+        {/*    target="_blank"*/}
+        {/*    display={'flex'}*/}
+        {/*    mt={4}*/}
+        {/*    w={['85%', '300px']}*/}
+        {/*    py={3}*/}
+        {/*    px={6}*/}
+        {/*    border={theme.borders.sm}*/}
+        {/*    borderWidth={'1.5px'}*/}
+        {/*    borderRadius={'md'}*/}
+        {/*    alignItems={'center'}*/}
+        {/*    userSelect={'none'}*/}
+        {/*    textDecoration={'none !important'}*/}
+        {/*  >*/}
+        {/*    <MyIcon name={'common/courseLight'} w={'18px'} color={'myGray.600'} />*/}
+        {/*    <Box ml={2} flex={1}>*/}
+        {/*      {t('system.Help Document')}*/}
+        {/*    </Box>*/}
+        {/*    <Box w={'8px'} h={'8px'} borderRadius={'50%'} bg={'#67c13b'} />*/}
+        {/*    <Box fontSize={'md'} ml={2}>*/}
+        {/*      V{systemVersion}*/}
+        {/*    </Box>*/}
+        {/*  </Link>*/}
+        {/*)}*/}
         {feConfigs?.chatbotUrl && (
           <Link
             href={feConfigs.chatbotUrl}

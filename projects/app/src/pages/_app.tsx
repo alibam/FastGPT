@@ -50,7 +50,7 @@ function App({ Component, pageProps }: AppProps) {
         feConfigs: { scripts, isPlus, show_git, systemTitle }
       } = await clientInitData();
 
-      setTitle(systemTitle || 'FastGPT');
+      setTitle(systemTitle || 'AI知识库');
 
       // log fastgpt
       if (!isPlus) {

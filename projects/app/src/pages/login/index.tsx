@@ -66,7 +66,7 @@ const Login = () => {
       <Flex
         alignItems={'center'}
         justifyContent={'center'}
-        bg={`url('/icon/login-bg.svg') no-repeat`}
+        // bg={`url('/icon/login-bg.svg') no-repeat`}
         backgroundSize={'cover'}
         userSelect={'none'}
         h={'100%'}
@@ -89,15 +89,26 @@ const Login = () => {
           <Box w={['100%', '380px']} flex={'1 0 0'}>
             <DynamicComponent type={pageType} />
           </Box>
+          {/*{feConfigs?.concatMd && (*/}
+          {/*  <Box*/}
+          {/*    mt={8}*/}
+          {/*    color={'primary.700'}*/}
+          {/*    cursor={'pointer'}*/}
+          {/*    textAlign={'center'}*/}
+          {/*    onClick={onOpen}*/}
+          {/*  >*/}
+          {/*    无法登录，点击联系*/}
+          {/*  </Box>*/}
+          {/*)}*/}
           {feConfigs?.concatMd && (
             <Box
               mt={8}
               color={'primary.700'}
               cursor={'pointer'}
               textAlign={'center'}
-              onClick={onOpen}
+              // onClick={onOpen}
             >
-              无法登录，点击联系
+              Powered by alibam
             </Box>
           )}
         </Flex>

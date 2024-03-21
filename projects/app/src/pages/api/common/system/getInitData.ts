@@ -44,7 +44,7 @@ const defaultFeConfigs: FastGPTFeConfigsType = {
   show_git: true,
   docUrl: 'https://doc.fastgpt.in',
   openAPIDocUrl: 'https://doc.fastgpt.in/docs/development/openapi',
-  systemTitle: 'FastGPT',
+  systemTitle: 'AI知识库',
   concatMd:
     '* 项目开源地址: [FastGPT GitHub](https://github.com/labring/FastGPT)\n* 交流群: ![](https://doc.fastgpt.in/wechat-fastgpt.webp)',
   limit: {
