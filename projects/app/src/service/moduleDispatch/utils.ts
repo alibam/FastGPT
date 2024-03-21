@@ -1,5 +1,43 @@
 import type { ChatItemType } from '@fastgpt/global/core/chat/type.d';
-import { DYNAMIC_INPUT_KEY, ModuleIOValueTypeEnum } from '@fastgpt/global/core/module/constants';
+import { ModuleIOValueTypeEnum, ModuleOutputKeyEnum } from '@fastgpt/global/core/module/constants';
+import { FlowNodeTypeEnum } from '@fastgpt/global/core/module/node/constant';
+import { ModuleItemType } from '@fastgpt/global/core/module/type.d';
+
+export const setEntryEntries = (modules: ModuleItemType[]) => {
+  const initRunningModuleType: Record<string, boolean> = {
+    [FlowNodeTypeEnum.historyNode]: true,
+    [FlowNodeTypeEnum.questionInput]: true,
+    [FlowNodeTypeEnum.pluginInput]: true
+  };
+
+  modules.forEach((item) => {
+    if (initRunningModuleType[item.flowType]) {
+      item.isEntry = true;
+    }
+  });
+  return modules;
+};
+
+export const checkTheModuleConnectedByTool = (
+  modules: ModuleItemType[],
+  module: ModuleItemType
+) => {
+  let sign = false;
+  const toolModules = modules.filter((item) => item.flowType === FlowNodeTypeEnum.tools);
+
+  toolModules.forEach((item) => {
+    const toolOutput = item.outputs.find(
+      (output) => output.key === ModuleOutputKeyEnum.selectedTools
+    );
+    toolOutput?.targets.forEach((target) => {
+      if (target.moduleId === module.moduleId) {
+        sign = true;
+      }
+    });
+  });
+
+  return sign;
+};
 
 export const getHistories = (history?: ChatItemType[] | number, histories: ChatItemType[] = []) => {
   if (!history) return [];
@@ -7,16 +45,6 @@ export const getHistories = (history?: ChatItemType[] | number, histories: ChatI
   if (Array.isArray(history)) return history;
 
   return [];
-};
-
-export const flatDynamicParams = (params: Record<string, any>) => {
-  const dynamicParams = params[DYNAMIC_INPUT_KEY];
-  if (!dynamicParams) return params;
-  return {
-    ...params,
-    ...dynamicParams,
-    [DYNAMIC_INPUT_KEY]: undefined
-  };
 };
 
 /* value type format */

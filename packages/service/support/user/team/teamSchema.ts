@@ -25,9 +25,8 @@ const TeamSchema = new Schema({
     type: Number,
     default: 0
   },
-  maxSize: {
-    type: Number,
-    default: 3
+  teamDomain: {
+    type: String
   },
   limit: {
     lastExportDatasetTime: {
@@ -40,7 +39,8 @@ const TeamSchema = new Schema({
 });
 
 try {
-  // TeamSchema.index({ createTime: -1 });
+  TeamSchema.index({ name: 1 });
+  TeamSchema.index({ ownerId: 1 });
 } catch (error) {
   console.log(error);
 }

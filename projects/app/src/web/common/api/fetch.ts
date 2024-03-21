@@ -1,9 +1,9 @@
-import { sseResponseEventEnum } from '@fastgpt/service/common/response/constant';
+import { SseResponseEventEnum } from '@fastgpt/global/core/module/runtime/constants';
 import { getErrText } from '@fastgpt/global/common/error/utils';
 import type { ChatHistoryItemResType } from '@fastgpt/global/core/chat/type.d';
-import { StartChatFnProps } from '@/components/ChatBox';
+import type { StartChatFnProps } from '@/components/ChatBox/type.d';
 import { getToken } from '@/web/support/user/auth';
-import { ModuleOutputKeyEnum } from '@fastgpt/global/core/module/constants';
+import { DispatchNodeResponseKeyEnum } from '@fastgpt/global/core/module/runtime/constants';
 import dayjs from 'dayjs';
 import {
   // refer to https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web
@@ -19,7 +19,7 @@ type StreamFetchProps = {
 };
 type StreamResponseType = {
   responseText: string;
-  [ModuleOutputKeyEnum.responseData]: ChatHistoryItemResType[];
+  [DispatchNodeResponseKeyEnum.nodeResponse]: ChatHistoryItemResType[];
 };
 export const streamFetch = ({
   url = '/api/v1/chat/completions',
@@ -34,7 +34,7 @@ export const streamFetch = ({
 
     // response data
     let responseText = '';
-    let remainText = '';
+    let remainTextList: { event: `${SseResponseEventEnum}`; text: string }[] = [];
     let errMsg = '';
     let responseData: ChatHistoryItemResType[] = [];
     let finished = false;
@@ -60,22 +60,30 @@ export const streamFetch = ({
     function animateResponseText() {
       // abort message
       if (abortCtrl.signal.aborted) {
-        onMessage({ text: remainText });
-        responseText += remainText;
+        remainTextList.forEach((item) => {
+          onMessage(item);
+          if (item.event === SseResponseEventEnum.answer) {
+            responseText += item.text;
+          }
+        });
         return finish();
       }
 
-      if (remainText) {
-        const fetchCount = Math.max(1, Math.round(remainText.length / 60));
-        const fetchText = remainText.slice(0, fetchCount);
+      if (remainTextList.length > 0) {
+        const fetchCount = Math.max(1, Math.round(remainTextList.length / 60));
 
-        onMessage({ text: fetchText });
+        for (let i = 0; i < fetchCount; i++) {
+          const item = remainTextList[i];
+          onMessage(item);
+          if (item.event === SseResponseEventEnum.answer) {
+            responseText += item.text;
+          }
+        }
 
-        responseText += fetchText;
-        remainText = remainText.slice(fetchCount);
+        remainTextList = remainTextList.slice(fetchCount);
       }
 
-      if (finished && !remainText) {
+      if (finished && remainTextList.length === 0) {
         return finish();
       }
 
@@ -125,7 +133,10 @@ export const streamFetch = ({
             try {
               failedFinish(await res.clone().json());
             } catch {
-              failedFinish(await res.clone().text());
+              const errText = await res.clone().text();
+              if (!errText.startsWith('event: error')) {
+                failedFinish();
+              }
             }
           }
         },
@@ -143,18 +154,34 @@ export const streamFetch = ({
             }
           })();
 
-          if (event === sseResponseEventEnum.answer) {
-            const answer: string = parseJson?.choices?.[0]?.delta?.content || '';
-            remainText += answer;
+          if (event === SseResponseEventEnum.answer) {
+            const text: string = parseJson?.choices?.[0]?.delta?.content || '';
+
+            for (const item of text) {
+              remainTextList.push({
+                event,
+                text: item
+              });
+            }
+          } else if (event === SseResponseEventEnum.fastAnswer) {
+            const text: string = parseJson?.choices?.[0]?.delta?.content || '';
+            remainTextList.push({
+              event,
+              text
+            });
           } else if (
-            event === sseResponseEventEnum.moduleStatus &&
-            parseJson?.name &&
-            parseJson?.status
+            event === SseResponseEventEnum.flowNodeStatus ||
+            event === SseResponseEventEnum.toolCall ||
+            event === SseResponseEventEnum.toolParams ||
+            event === SseResponseEventEnum.toolResponse
           ) {
-            onMessage(parseJson);
-          } else if (event === sseResponseEventEnum.appStreamResponse && Array.isArray(parseJson)) {
+            onMessage({
+              event,
+              ...parseJson
+            });
+          } else if (event === SseResponseEventEnum.flowResponses && Array.isArray(parseJson)) {
             responseData = parseJson;
-          } else if (event === sseResponseEventEnum.error) {
+          } else if (event === SseResponseEventEnum.error) {
             errMsg = getErrText(parseJson, '流响应错误');
           }
         },

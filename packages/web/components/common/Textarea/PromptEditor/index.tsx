@@ -1,8 +1,8 @@
 import { Button, ModalBody, ModalFooter, useDisclosure } from '@chakra-ui/react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { editorStateToText } from './utils';
 import Editor from './Editor';
-import MyModal from '../../MyModal';
+import MyModal from '../../CustomModal';
 import { useTranslation } from 'next-i18next';
 import { $getRoot, EditorState, type LexicalEditor } from 'lexical';
 import { EditorVariablePickerType } from './type.d';
@@ -10,6 +10,7 @@ import { useCallback, useTransition } from 'react';
 
 const PromptEditor = ({
   showOpenModal = true,
+  showResize = true,
   variables = [],
   value,
   onChange,
@@ -19,6 +20,7 @@ const PromptEditor = ({
   title
 }: {
   showOpenModal?: boolean;
+  showResize?: boolean;
   variables?: EditorVariablePickerType[];
   value?: string;
   onChange?: (text: string) => void;
@@ -48,7 +50,7 @@ const PromptEditor = ({
   return (
     <>
       <Editor
-        showResize
+        showResize={showResize}
         showOpenModal={showOpenModal}
         onOpenModal={onOpen}
         variables={variables}

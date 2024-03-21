@@ -33,7 +33,7 @@ import {
 } from '@fastgpt/global/core/dataset/constants';
 import dynamic from 'next/dynamic';
 import { useForm } from 'react-hook-form';
-import MySelect from '@/components/Select';
+import MySelect from '@fastgpt/web/components/common/MySelect';
 import { useSelectFile } from '@/web/common/file/hooks/useSelectFile';
 import { fileDownload } from '@/web/common/file/utils';
 import { readCsvContent } from '@fastgpt/web/common/file/read/csv';
@@ -41,6 +41,7 @@ import { delay } from '@fastgpt/global/common/system/utils';
 import QuoteItem from '@/components/core/dataset/QuoteItem';
 import { ModuleInputKeyEnum } from '@fastgpt/global/core/module/constants';
 import { useSystemStore } from '@/web/common/system/useSystemStore';
+import SearchParamsTip from '@/components/core/dataset/SearchParamsTip';
 
 const nanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz1234567890', 12);
 
@@ -121,7 +122,8 @@ const Test = ({ datasetId }: { datasetId: string }) => {
         searchMode: res.searchMode,
         usingReRank: res.usingReRank,
         limit: res.limit,
-        similarity: res.similarity
+        similarity: res.similarity,
+        usingQueryExtension: res.usingQueryExtension
       };
       pushDatasetTestItem(testItem);
       setDatasetTestItem(testItem);
@@ -477,41 +479,15 @@ const TestResults = React.memo(function TestResults({
             <MyIcon name={'common/paramsLight'} w={'18px'} mr={2} />
             {t('core.dataset.test.Test params')}
           </Flex>
-          <TableContainer
-            mt={3}
-            bg={'primary.50'}
-            borderRadius={'lg'}
-            borderWidth={'1px'}
-            borderColor={'primary.1'}
-          >
-            <Table>
-              <Thead>
-                <Tr color={'myGray.600'}>
-                  <Th>{t('core.dataset.search.search mode')}</Th>
-                  <Th>{t('core.dataset.search.ReRank')}</Th>
-                  <Th>{t('core.dataset.search.Max Tokens')}</Th>
-                  <Th>{t('core.dataset.search.Min Similarity')}</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr color={'myGray.800'}>
-                  <Td pt={0}>
-                    <Flex alignItems={'center'}>
-                      <MyIcon
-                        name={DatasetSearchModeMap[datasetTestItem.searchMode]?.icon as any}
-                        w={'12px'}
-                        mr={'1px'}
-                      />
-                      {t(DatasetSearchModeMap[datasetTestItem.searchMode]?.title)}
-                    </Flex>
-                  </Td>
-                  <Td pt={0}>{datasetTestItem.usingReRank ? '✅' : '❌'}</Td>
-                  <Td pt={0}>{datasetTestItem.limit}</Td>
-                  <Td pt={0}>{datasetTestItem.similarity}</Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </TableContainer>
+          <Box mt={3}>
+            <SearchParamsTip
+              searchMode={datasetTestItem.searchMode}
+              similarity={datasetTestItem.similarity}
+              limit={datasetTestItem.limit}
+              usingReRank={datasetTestItem.usingReRank}
+              usingQueryExtension={datasetTestItem.usingQueryExtension}
+            />
+          </Box>
 
           <Flex mt={5} mb={3} alignItems={'center'}>
             <Flex fontSize={'xl'} color={'myGray.900'} alignItems={'center'}>

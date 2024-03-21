@@ -1,21 +1,35 @@
-import type { moduleDispatchResType } from '@fastgpt/global/core/chat/type.d';
 import type { ModuleDispatchProps } from '@fastgpt/global/core/module/type.d';
-import { ModuleInputKeyEnum, ModuleOutputKeyEnum } from '@fastgpt/global/core/module/constants';
+import {
+  DYNAMIC_INPUT_KEY,
+  ModuleInputKeyEnum,
+  ModuleOutputKeyEnum
+} from '@fastgpt/global/core/module/constants';
+import { DispatchNodeResponseKeyEnum } from '@fastgpt/global/core/module/runtime/constants';
 import axios from 'axios';
-import { flatDynamicParams, valueTypeFormat } from '../utils';
+import { valueTypeFormat } from '../utils';
 import { SERVICE_LOCAL_HOST } from '@fastgpt/service/common/system/tools';
+import { DispatchNodeResultType } from '@fastgpt/global/core/module/runtime/type';
 
-export type HttpRequestProps = ModuleDispatchProps<{
+type HttpRequestProps = ModuleDispatchProps<{
   [ModuleInputKeyEnum.abandon_httpUrl]: string;
   [ModuleInputKeyEnum.httpMethod]: string;
   [ModuleInputKeyEnum.httpReqUrl]: string;
-  [ModuleInputKeyEnum.httpHeader]: string;
+  [ModuleInputKeyEnum.httpHeaders]: string;
   [key: string]: any;
 }>;
-export type HttpResponse = {
+type HttpResponse = DispatchNodeResultType<{
   [ModuleOutputKeyEnum.failed]?: boolean;
-  [ModuleOutputKeyEnum.responseData]: moduleDispatchResType;
   [key: string]: any;
+}>;
+
+const flatDynamicParams = (params: Record<string, any>) => {
+  const dynamicParams = params[DYNAMIC_INPUT_KEY];
+  if (!dynamicParams) return params;
+  return {
+    ...params,
+    ...dynamicParams,
+    [DYNAMIC_INPUT_KEY]: undefined
+  };
 };
 
 export const dispatchHttpRequest = async (props: HttpRequestProps): Promise<HttpResponse> => {
@@ -24,7 +38,7 @@ export const dispatchHttpRequest = async (props: HttpRequestProps): Promise<Http
     chatId,
     responseChatItemId,
     variables,
-    outputs,
+    module: { outputs },
     params: {
       system_httpMethod: httpMethod = 'POST',
       system_httpReqUrl: httpReqUrl,
@@ -83,8 +97,8 @@ export const dispatchHttpRequest = async (props: HttpRequestProps): Promise<Http
     }
 
     return {
-      responseData: {
-        price: 0,
+      [DispatchNodeResponseKeyEnum.nodeResponse]: {
+        totalPoints: 0,
         body: formatBody,
         httpResult: response
       },
@@ -95,8 +109,8 @@ export const dispatchHttpRequest = async (props: HttpRequestProps): Promise<Http
 
     return {
       [ModuleOutputKeyEnum.failed]: true,
-      responseData: {
-        price: 0,
+      [DispatchNodeResponseKeyEnum.nodeResponse]: {
+        totalPoints: 0,
         body: formatBody,
         httpResult: { error }
       }
@@ -125,6 +139,7 @@ async function fetchData({
       'Content-Type': 'application/json',
       ...headers
     },
+    timeout: 360000,
     params: method === 'GET' ? query : {},
     data: method === 'POST' ? body : {}
   });

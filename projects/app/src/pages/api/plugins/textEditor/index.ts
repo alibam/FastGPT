@@ -12,7 +12,8 @@ type Props = HttpBodyType<{
 export default async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const {
-      data: { text, ...obj }
+      text,
+      DYNAMIC_INPUT_KEY: { ...obj }
     } = req.body as Props;
 
     await authRequestFromLocal({ req });
@@ -33,7 +34,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     });
 
     const textResult = replaceVariable(text, obj);
-
     res.json({
       text: textResult
     });

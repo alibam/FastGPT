@@ -26,16 +26,15 @@ import { useAppStore } from '@/web/core/app/store/useAppStore';
 import { postForm2Modules } from '@/web/core/app/utils';
 
 import dynamic from 'next/dynamic';
-import MySelect from '@/components/Select';
 import MyTooltip from '@/components/MyTooltip';
 import Avatar from '@/components/Avatar';
 import MyIcon from '@fastgpt/web/components/common/Icon';
 import VariableEdit from '@/components/core/module/Flow/components/modules/VariableEdit';
 import MyTextarea from '@/components/common/Textarea/MyTextarea/index';
-import { DatasetSearchModeMap } from '@fastgpt/global/core/dataset/constants';
-import SelectAiModel from '@/components/Select/SelectAiModel';
 import PromptEditor from '@fastgpt/web/components/common/Textarea/PromptEditor';
 import { formatEditorVariablePickerIcon } from '@fastgpt/global/core/module/utils';
+import SearchParamsTip from '@/components/core/dataset/SearchParamsTip';
+import SelectAiModel from '@/components/Select/SelectAiModel';
 
 const DatasetSelectModal = dynamic(() => import('@/components/core/module/DatasetSelectModal'));
 const DatasetParamsModal = dynamic(() => import('@/components/core/module/DatasetParamsModal'));
@@ -112,11 +111,6 @@ const EditForm = ({
   const tokenLimit = useMemo(() => {
     return llmModelList.find((item) => item.model === selectLLMModel)?.quoteMaxToken || 3000;
   }, [selectLLMModel, llmModelList]);
-
-  const datasetSearchMode = useMemo(() => {
-    if (!searchMode) return '';
-    return t(DatasetSearchModeMap[searchMode]?.title);
-  }, [searchMode, t]);
 
   const { mutate: onSubmitSave, isLoading: isSaving } = useRequest({
     mutationFn: async (data: AppSimpleEditFormType) => {
@@ -308,23 +302,16 @@ const EditForm = ({
               </Flex>
             </Flex>
             {getValues('dataset.datasets').length > 0 && (
-              <Flex mt={1} color={'myGray.600'} fontSize={'sm'} mb={2}>
-                {t('core.dataset.search.search mode')}: {datasetSearchMode}
-                {', '}
-                {reRankModelList.length > 0 && (
-                  <>
-                    {t('core.dataset.search.ReRank')}:{' '}
-                    {getValues('dataset.usingReRank') ? '✅' : '✖'}
-                  </>
-                )}
-                {', '}
-                {t('core.dataset.search.Min Similarity')}: {getValues('dataset.similarity')}
-                {', '}
-                {t('core.dataset.search.Max Tokens')}: {getValues('dataset.limit')}
-                {getValues('dataset.searchEmptyText') === ''
-                  ? ''
-                  : t('core.dataset.Set Empty Result Tip')}
-              </Flex>
+              <Box my={3}>
+                <SearchParamsTip
+                  searchMode={searchMode}
+                  similarity={getValues('dataset.similarity')}
+                  limit={getValues('dataset.limit')}
+                  usingReRank={getValues('dataset.usingReRank')}
+                  usingQueryExtension={getValues('dataset.datasetSearchUsingExtensionQuery')}
+                  responseEmptyText={getValues('dataset.searchEmptyText')}
+                />
+              </Box>
             )}
             <Grid
               gridTemplateColumns={['repeat(2, minmax(0, 1fr))', 'repeat(3, minmax(0, 1fr))']}

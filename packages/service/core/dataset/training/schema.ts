@@ -2,7 +2,7 @@
 import { connectionMongo, type Model } from '../../../common/mongo';
 const { Schema, model, models } = connectionMongo;
 import { DatasetTrainingSchemaType } from '@fastgpt/global/core/dataset/type';
-import { DatasetDataIndexTypeMap, TrainingTypeMap } from '@fastgpt/global/core/dataset/constants';
+import { TrainingTypeMap } from '@fastgpt/global/core/dataset/constants';
 import { DatasetColCollectionName } from '../collection/schema';
 import { DatasetCollectionName } from '../schema';
 import {
@@ -86,11 +86,6 @@ const TrainingDataSchema = new Schema({
   indexes: {
     type: [
       {
-        type: {
-          type: String,
-          enum: Object.keys(DatasetDataIndexTypeMap),
-          required: true
-        },
         text: {
           type: String,
           required: true
@@ -105,8 +100,7 @@ try {
   // lock training data; delete training data
   TrainingDataSchema.index({ teamId: 1, collectionId: 1 });
   // get training data and sort
-  TrainingDataSchema.index({ weight: -1 });
-  TrainingDataSchema.index({ lockTime: 1 });
+  TrainingDataSchema.index({ lockTime: 1, mode: 1, weight: -1 });
   TrainingDataSchema.index({ expireAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 }); // 7 days
 } catch (error) {
   console.log(error);

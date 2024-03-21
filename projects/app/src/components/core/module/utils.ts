@@ -14,7 +14,8 @@ export const flowNode2Modules = ({
   const modules: ModuleItemType[] = nodes.map((item) => ({
     moduleId: item.data.moduleId,
     name: item.data.name,
-    // avatar: item.data.avatar,
+    intro: item.data.intro,
+    avatar: item.data.avatar,
     flowType: item.data.flowType,
     showStatus: item.data.showStatus,
     position: item.position,
@@ -38,10 +39,15 @@ export const flowNode2Modules = ({
 
     module.outputs.forEach((output) => {
       output.targets = edges
-        .filter(
-          (edge) =>
-            edge.source === module.moduleId && edge.sourceHandle === output.key && edge.targetHandle
-        )
+        .filter((edge) => {
+          if (
+            edge.source === module.moduleId &&
+            edge.sourceHandle === output.key &&
+            edge.targetHandle
+          ) {
+            return true;
+          }
+        })
         .map((edge) => ({
           moduleId: edge.target,
           key: edge.targetHandle || ''
